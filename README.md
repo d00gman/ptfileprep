@@ -1,4 +1,4 @@
-# DESCRIPTION
+## DESCRIPTION
 
 The value in performing a penetration test for a client is directly related to the information provided
 to them at the end of the engagement. With many engagements encompassing many target hosts, tracking
@@ -54,7 +54,7 @@ $./ptfileprep.py nmap 192.168.20.0/24
 [*] Now writing hosts.txt file with list of live IP/hosts...
 [*] Pentest file repository framework successfully created...
 
-### LICENSE
+## LICENSE
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -69,13 +69,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#### TODOLIST
+### TODOLIST
 
 TODO add support for different nmap scans such as -sS, etc.
 TODO add support for other scanners such as unicornscan, etc.
 TODO add support for recording hostnames if revealed during scan
 
-##### CHANGE LOG
+#### CHANGE LOG
 
 v10 2016-10-07
 - initial release
