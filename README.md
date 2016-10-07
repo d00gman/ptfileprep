@@ -24,22 +24,22 @@ listing live hosts found to be used with other tools.
 ## USAGE
 
 Create penetration test file repository for a single IP address
-
+```
 $./ptfileprep.py ip 192.168.20.1
 [*] Single IP only mode.
 [*] Now creating directories...
 [*] Pentest file repository framework successfully created... 
-
+```
 Create penetration test file repository from file containing IP addresses
-
+```
 $./ptfileprep.py file hosts.txt
 [*] File in mode.
 [*] Now reading hosts.txt file...
 [*] Now creating directories...
 [*] Pentest file repository framework successfully created...
-
+```
 Create penetration test file repository from results of an nmap ping scan
-
+```
 $./ptfileprep.py nmap 192.168.20.0/24
 [*] Using nmap scan mode.
 
@@ -53,7 +53,7 @@ $./ptfileprep.py nmap 192.168.20.0/24
 [*] Now creating directories...
 [*] Now writing hosts.txt file with list of live IP/hosts...
 [*] Pentest file repository framework successfully created...
-
+```
 ## LICENSE
 
 This program is free software: you can redistribute it and/or modify
