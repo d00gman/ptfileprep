@@ -1,3 +1,5 @@
+
+
 ## DESCRIPTION
 
 The value in performing a penetration test for a client is directly related to the information provided
@@ -6,6 +8,8 @@ information throughout can be cumbersome and time consuming. This tool creates a
 directory tree structure for penetration test reporting/file storage based on single host, list of hosts,
 or nmap ping sweep of given network range to keep things organized throughout the engagement and save
 time assembling the final report.
+
+Questions, comments, or concerns can be directed to keith.thome@outlook.com.
 
 Subdirectories created can be customized by modifying the SUB_DIR_FRAMEWORK array.
 
@@ -68,12 +72,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-### TODOLIST
-
-TODO add support for different nmap scans such as -sS, etc.
-TODO add support for other scanners such as unicornscan, etc.
-TODO add support for recording hostnames if revealed during scan
 
 #### CHANGE LOG
 
