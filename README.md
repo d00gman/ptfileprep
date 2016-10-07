@@ -14,14 +14,14 @@ Questions, comments, or concerns can be directed to keith.thome@outlook.com.
 Subdirectories created can be customized by modifying the SUB_DIR_FRAMEWORK array.
 
 Currently, the directory tree created for file storage is:
-
+```
 /(ip address)/
       --/recon
       --/tools
       --/exfil
       --/misc
       --/proofs
-
+```
 Additionally, when utilizing network scanners to identify live hosts, a hosts.txt file will be created
 listing live hosts found to be used with other tools.
 
