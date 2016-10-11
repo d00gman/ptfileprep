@@ -93,5 +93,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 v12 2016-10-11
 - added support for netdiscover scans
 - added support for -e exclusion switch to exclude single IP, range of IPs, or IPs from a file
+
 v10 2016-10-07
 - initial release
