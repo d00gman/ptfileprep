@@ -2,7 +2,7 @@
 #
 # Pentest File Prep 
 # ptfileprep.py (c) 2016 Keith Thome
-# revision 1.0, 2016-10-07
+# revision 1.2, 2016-10-11
 #
 # author: Keith Thome
 # contact: keith.thome@outlook.com
@@ -52,7 +52,7 @@
 # $./ptfileprep.py nmap 192.168.20.0/24
 # [*] Using nmap scan mode.
 # 
-# [+] Sweeping range 192.168.20.0/24 for live hosts
+# [*] Sweeping range 192.168.20.0/24 for live hosts
 # [*] 192.168.20.1
 # [*] 192.168.20.2
 # [*] 192.168.20.254
@@ -62,7 +62,23 @@
 # [*] Now creating directories...
 # [*] Now writing hosts.txt file with list of live IP/hosts...
 # [*] Pentest file repository framework successfully created...
-
+#
+# Create penetration test file repository from results of an nmap ping scan
+# excluding a network range
+#
+# $./ptfileprep.py eR 192.168.20.1-192.168.20.5 nmap 192.168.20.0/24
+# [*] Excluding 192.168.20.1-192.168.20.5 IP range from processing
+# [*] Using nmap scan mode.
+# 
+# [*] Sweeping range 192.168.20.0/24 for live hosts
+# [*] 192.168.20.254
+# [*] 192.168.20.130
+# 
+# [*] Found 2 live hosts
+# [*] Now creating directories...
+# [*] Now writing hosts.txt file with list of live IP/hosts...
+# [*] Pentest file repository framework successfully created...
+#
 # LICENSE
 #
 # This program is free software: you can redistribute it and/or modify
@@ -80,12 +96,13 @@
 #
 # TODOLIST
 #
-# TODO add support for different nmap scans such as -sS, etc.
-# TODO add support for other scanners such as unicornscan, etc.
 # TODO add support for recording hostnames if revealed during scan
 #
 # CHANGE LOG
-#
+# 
+# v12 2016-10-11
+# - added support for netdiscover scans
+# - added support for -e exclusion switch to exclude single IP, range of IPs, or IPs from a file
 # v10 2016-10-07
 # - initial release
 
@@ -97,18 +114,32 @@ import argparse
 # subdirectories to create for each IP/host
 SUB_DIR_FRAMEWORK = ["recon", "tools", "exfil", "proofs", "misc"]
 
-# live IP/hostnames found
+# IPs to create repository from
 ip_addresses = []
 
-# option variables
-progOptions = {'ip': None, 'fileIn': None, 'range': None}
+# IPs that should be excluded
+exclusions = []
 
+def exclude_iprange(ip_range):
+    start_ip = ip_range.split("-")[0]
+    end_ip = ip_range.split("-")[1]
+    start = list(map(int,start_ip.split('.')))
+    end = list(map(int,end_ip.split('.')))
+    iprange=[]
+    while start!= end:
+        for i in range(len(start)-1,-1,-1):
+            if start[i]<255:
+                start[i]+=1
+                break
+            else:
+                start[i]=0
+        exclusions.append('.'.join(map(str,start)))
 
-def performScan():
+def performNmapScan(ip_range):
     ip_address = ""
     print " "
-    print "[+] Sweeping range %s" % (progOptions['range']) + " for live hosts"
-    scan_results = "nmap -n -sP %s" % (progOptions['range'])
+    print "[*] Sweeping range %s" % ip_range + " for live hosts using nmap"
+    scan_results = "nmap -n -sP %s" % ip_range
     results = subprocess.check_output(scan_results, shell=True)
     lines = results.split("\n")
     for line in lines:
@@ -116,12 +147,30 @@ def performScan():
         line = line.rstrip()
         if ("Nmap scan report for" in line):
             ip_address = line.split(" ")[4]
+            if ip_address not in exclusions:
+                print "[*] %s" % (ip_address)
+                ip_addresses.append(ip_address)
+
+    print " "
+    print "[*] Found %s live hosts" % (len(ip_addresses))
+
+def performNetdiscoverScan(ip_range):
+    ip_address = ""
+    print " "
+    print "[*] Sweeping range %s" % ip_range + " for live hosts using netdiscover"
+    scan_results = "netdiscover -P -N -r %s" % ip_range
+    results = subprocess.check_output(scan_results, shell=True)
+    lines = results.split("\n")
+    for line in lines:
+        line = line.strip()
+        line = line.rstrip()
+        ip_address = line.split(" ")[0]
+        if len(ip_address) > 7 and ip_address not in exclusions:
             print "[*] %s" % (ip_address)
             ip_addresses.append(ip_address)
 
     print " "
     print "[*] Found %s live hosts" % (len(ip_addresses))
-
 
 def createDirTree():
     print "[*] Now creating directories..."
@@ -140,7 +189,7 @@ def createDirTree():
                 os.mkdir(ip_address + "/" + sub_dir)
 
 def writeHostsTxt():
-        # write single hosts.txt file containing list of IP addresses found
+    # write single hosts.txt file containing list of IP addresses found
     print "[*] Now writing hosts.txt file with list of live IP/hosts..."
     hostsFile = "hosts.txt"
     f = open(hostsFile, 'w')
@@ -153,7 +202,8 @@ def readHosts():
     print "[*] Now reading %s file..." % progOptions['fileIn']
     f = open(progOptions['fileIn'], 'r')
     for ip_address in f.readlines():
-        ip_addresses.append(ip_address.rstrip('\n'))
+        if ip_address not in exclusions:
+            ip_addresses.append(ip_address.rstrip('\n'))
     f.close()
 
 
@@ -161,8 +211,12 @@ def main():
 
     usage = "ptfileprep.py <command> [<args>]"
 
-    parser = argparse.ArgumentParser(usage, version='Pentest File Prep 1.0.2 (c) Keith Thome',
+    parser = argparse.ArgumentParser(usage, version='Pentest File Prep 1.2 (c) Keith Thome',
                                      description='Creates initial file repository directory tree structure for penetration test reporting/file storage based on single host, list of hosts, or nmap ping sweep of given network range.')
+
+    parser.add_argument('-eI', '--excludeIP', dest='excludeIP', help='Exclude single IP from processing.')
+    parser.add_argument('-eR', '--excludeRange', dest='excludeRange', help='Exclude range of IPs from processing in the form of starting ip-ending ip. Ie. 192.168.20.5-192.168.20.10')
+    parser.add_argument('-eF', '--excludeFile', dest='excludeFile', help='Exclude IPs contained in file from processing.')
 
     subparsers = parser.add_subparsers(help='sub-command help')
 
@@ -178,20 +232,41 @@ def main():
         'file_in', help='File containing list of IP addresses to create file repository from.')
     parser_file.set_defaults(action='file')
 
-    parser_range = subparsers.add_parser(
+    parser_nmap = subparsers.add_parser(
         'nmap', help='Create file repository from live hosts found via a nmap network range ping scan.')
-    parser_range.add_argument(
+    parser_nmap.add_argument(
         'ip_range', help='IP block to pass to nmap for scanning.')
-    parser_range.set_defaults(action='nmap')
+    parser_nmap.set_defaults(action='nmap')
+
+    parser_netdiscover = subparsers.add_parser(
+        'netdiscover', help='Create file repository from live hosts found via a netdiscover network range ping scan.')
+    parser_netdiscover.add_argument(
+        'ip_range', help='IP block to pass to netdiscover for scanning.')
+    parser_netdiscover.set_defaults(action='netdiscover')
 
     args = parser.parse_args()
 
     if len(sys.argv) > 1:
 
+        if args.excludeIP is not None:
+            exclusions.append(args.excludeIP)
+            print "[*] Excluding %s from processing" % args.excludeIP
+
+        if args.excludeFile is not None:
+            print "[*] Now reading %s exclusions file..." % args.excludeFile
+            f = open(args.excludeFile, 'r')
+            for ip_address in f.readlines():
+                exclusions.append(ip_address.rstrip('\n'))
+            f.close()
+
+        if args.excludeRange is not None:
+            print "[*] Excluding %s IP range from processing" % args.excludeRange
+            exclude_iprange(args.excludeRange)
+
         if args.action == "ip":
             print "[*] Single IP only mode."
-            progOptions['ip'] = args.ip_address
-            ip_addresses.append(progOptions['ip'])
+            if args.ip_address not in exclusions:
+                ip_addresses.append(args.ip_address)
             createDirTree()
 
         elif args.action == "file":
@@ -202,8 +277,13 @@ def main():
 
         elif args.action == "nmap":
             print "[*] Using nmap scan mode."
-            progOptions['range'] = args.ip_range
-            performScan()
+            performNmapScan(args.ip_range)
+            createDirTree()
+            writeHostsTxt()
+
+        elif args.action == "netdiscover":
+            print "[*] Using netdiscover scan mode."
+            performNetdiscoverScan(args.ip_range)
             createDirTree()
             writeHostsTxt()
 

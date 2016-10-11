@@ -58,6 +58,22 @@ $./ptfileprep.py nmap 192.168.20.0/24
 [*] Now writing hosts.txt file with list of live IP/hosts...
 [*] Pentest file repository framework successfully created...
 ```
+Create penetration test file repository from results of an nmap ping scan
+excluding a network range
+```
+$./ptfileprep.py -eR 192.168.20.1-192.168.20.5 nmap 192.168.20.0/24
+[*] Excluding 192.168.20.1-192.168.20.5 IP range from processing
+[*] Using nmap scan mode.
+
+[*] Sweeping range 192.168.20.0/24 for live hosts
+[*] 192.168.20.254
+[*] 192.168.20.130
+
+[*] Found 2 live hosts
+[*] Now creating directories...
+[*] Now writing hosts.txt file with list of live IP/hosts...
+[*] Pentest file repository framework successfully created...
+```
 ## LICENSE
 
 This program is free software: you can redistribute it and/or modify
@@ -74,6 +90,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #### CHANGE LOG
-
+v12 2016-10-11
+- added support for netdiscover scans
+- added support for -e exclusion switch to exclude single IP, range of IPs, or IPs from a file
 v10 2016-10-07
 - initial release
