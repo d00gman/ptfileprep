@@ -6,7 +6,7 @@ The value in performing a penetration test for a client is directly related to t
 to them at the end of the engagement. With many engagements encompassing many target hosts, tracking
 information throughout can be cumbersome and time consuming. This tool creates an initial file repository
 directory tree structure for penetration test reporting/file storage based on single host, list of hosts,
-or nmap ping sweep of given network range to keep things organized throughout the engagement and save
+or nmap/netdiscover ping sweep of given network range to keep things organized throughout the engagement and save
 time assembling the final report.
 
 Questions, comments, or concerns can be directed to keith.thome@outlook.com.
