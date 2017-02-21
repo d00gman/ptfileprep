@@ -2,7 +2,7 @@
 #
 # Pentest File Prep 
 # ptfileprep.py (c) 2016 Keith Thome
-# revision 1.2, 2016-10-11
+# revision 1.3, 2016-10-24
 #
 # author: Keith Thome
 # contact: keith.thome@outlook.com
@@ -22,8 +22,8 @@
 # 
 # /(ip address)/
 #       --/recon
-#       --/tools
-#       --/exfil
+#		--/exploitation
+#       --/enumeration
 #       --/misc
 #       --/proofs
 #
@@ -112,13 +112,15 @@ import os
 import argparse
 
 # subdirectories to create for each IP/host
-SUB_DIR_FRAMEWORK = ["recon", "tools", "exfil", "proofs", "misc"]
+SUB_DIR_FRAMEWORK = ["recon", "exploitation", "enumeration", "proofs", "misc"]
 
 # IPs to create repository from
 ip_addresses = []
 
 # IPs that should be excluded
 exclusions = []
+
+progOptions = {'fileIn':None}
 
 def exclude_iprange(ip_range):
     start_ip = ip_range.split("-")[0]
@@ -211,7 +213,7 @@ def main():
 
     usage = "ptfileprep.py <command> [<args>]"
 
-    parser = argparse.ArgumentParser(usage, version='Pentest File Prep 1.2 (c) Keith Thome',
+    parser = argparse.ArgumentParser(usage, version='Pentest File Prep 1.3 (c) Keith Thome',
                                      description='Creates initial file repository directory tree structure for penetration test reporting/file storage based on single host, list of hosts, or nmap ping sweep of given network range.')
 
     parser.add_argument('-eI', '--excludeIP', dest='excludeIP', help='Exclude single IP from processing.')
