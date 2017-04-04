@@ -17,8 +17,8 @@ Currently, the directory tree created for file storage is:
 ```
 /(ip address)/
       --/recon
-      --/tools
-      --/exfil
+	--/exploitation
+      --/enumeration
       --/misc
       --/proofs
 ```
